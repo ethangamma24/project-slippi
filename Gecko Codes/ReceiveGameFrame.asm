@@ -62,7 +62,7 @@ lwz r3, 0x4(r8)
 cmpwi r3, 0xE
 bne+ WRITE_IS_FOLLOWER
 
-# we need to check if this is a follower (nana). should not save inputs for nana
+# we need to check if this is a follower (nana)
 lwz r3, 0xB4(r8) # load pointer to follower for this port
 cmpw r3, r30 # compare follower pointer with current pointer
 bne WRITE_IS_FOLLOWER # if the two  dont match, this is popo
@@ -95,6 +95,8 @@ bl readWordExi
 stw r3,0xB4(r31) #y position
 bl readWordExi
 stw r3,0x2C(r31) #facing direction
+bl readWordExi
+stw r3,0x10(r31) #animation state ID
 
 bl endExiTransfer
 
