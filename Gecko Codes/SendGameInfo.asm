@@ -28,7 +28,7 @@ bl sendByteExi
 # we can write this in only a byte because I doubt it will ever be larger
 # than 255. We write out the sizes of the other commands as half words for
 # consistent parsing
-li r3, 10
+li r3, 13
 bl sendByteExi
 
 # game info command
@@ -47,6 +47,12 @@ bl sendHalfExi
 li r3, 0x39
 bl sendByteExi
 li r3, 1
+bl sendHalfExi
+
+# player action state changed command
+li r3, 0x40
+bl sendByteExi
+li r3, 29
 bl sendHalfExi
 
 #------------- BEGIN GAME INFO COMMAND -------------
