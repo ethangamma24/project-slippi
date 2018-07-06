@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
 import classNames from 'classnames';
 import _ from 'lodash';
 import {
@@ -7,17 +6,13 @@ import {
 } from 'semantic-ui-react';
 
 import PageHeader from '../common/PageHeader';
-import OverallTable from './OverallTable';
-import KillsTable from './KillsTable';
-import PunishesTable from './PunishesTable';
 
-import styles from './GameProfile.scss';
+import styles from './GameReplay.scss';
 
-import getLocalImage from '../../utils/image';
-import * as stageUtils from '../../utils/stages';
-import * as timeUtils from '../../utils/time';
+export default class GameReplay extends Component {
 
-export default class GameProfile extends Component {
+  const { desktopCapturer } = require('electron');
+
   props: {
     history: object,
 
@@ -50,6 +45,38 @@ export default class GameProfile extends Component {
       fullPath: filePath,
     });
   };
+
+  function ReplayCapture() {
+    desktopCapturer.getSources({types: ['window', 'screen']}, (error, sources) => {
+      if (error) {
+        throw error;
+      }
+      for (let i = 0; i < sources.length; ++i) {
+        if (sources[i].name.includes('|FPS:')) {
+          navigator.mediaDevices.getUserMedia({
+            audio: {
+              mandatory: {
+                chromeMediaSource: 'desktop'
+              }
+            },
+            video: {
+              mandatory: {
+                chromeMediaSource: 'desktop',
+                // chromeMediaSourceId: sources[i].id,
+                minWidth: 960,
+                maxWidth: 960,
+                minHeight: 792,
+                maxHeight: 792
+              }
+            }
+          })
+          .then((stream) => handleStream(stream))
+          .catch((e) => handleError(e))
+          return
+        }
+      }
+    })
+  }
 
   renderContent() {
     const gameSettings = _.get(this.props.store, ['game', 'settings']) || {};
@@ -331,11 +358,37 @@ export default class GameProfile extends Component {
     );
   }
 
+  renderReplay() {
+    return (
+      <Segment basic={true}>
+        <Header className={styles['section-header']} inverted={true} as="h2">
+          Replay Viewer
+        </Header>
+        <div className={player}>
+          this.ReplayCapture()
+        </div>
+      </Segment>
+    );
+  }
+
   getPlayerIndex(isFirstPlayer = true) {
     const gameSettings = _.get(this.props.store, ['game', 'settings']) || {};
     const players = gameSettings.players || [];
     const player = (isFirstPlayer ? _.first(players) : _.last(players)) || {};
     return player.playerIndex;
+  }
+
+  function handleStream(stream) {
+    const video = document.querySelector('video')
+    const audio = document.querySelector('audio')
+    video.srcObject = stream
+    audio.srcObject = stream
+    video.onlodedmetadata = (e) => video.play()
+    audio.onlodedmetadata = (e) => audio.play()
+  }
+
+  function handleError(e) {
+    console.log(e)
   }
 
   render() {
