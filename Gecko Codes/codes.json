@@ -5,7 +5,8 @@
       "name": "Slippi Recording",
       "authors": [
         "Fizzi",
-        "Achilles"
+        "Achilles",
+        "UnclePunch"
       ],
       "description": [
         "Used in conjunction with Slippi plugged into PortB to extract game data"
@@ -40,6 +41,18 @@
           "address": "802fed3c",
           "targetAddress": "8032ed94",
           "annotation": "FlushFrameBuffer [Fizzi]"
+        },
+        {
+          "type": "replace",
+          "address": "801A4F84",
+          "value": "60000000",
+          "annotation": "Disable Screenshots 1/2"
+        },
+        {
+          "type": "replace",
+          "address": "801A5070",
+          "value": "60000000",
+          "annotation": "Disable Screenshots 2/2"
         },
         {
           "type": "replaceCodeBlock",
