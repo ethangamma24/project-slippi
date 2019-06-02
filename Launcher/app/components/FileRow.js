@@ -1,20 +1,28 @@
 import _ from 'lodash';
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import { Table, Button, Image } from 'semantic-ui-react';
+import { Table, Button, Image, Modal, Form } from 'semantic-ui-react';
 import styles from './FileLoader.scss';
 import getLocalImage from '../utils/image';
 import * as stageUtils from '../utils/stages';
 import * as timeUtils from '../utils/time';
 
 const path = require('path');
+const fs = require('fs');
+const prompt = require('electron-prompt');
+const electronSettings = require('electron-settings');
+const getCurrentWindow = require('electron').remote;
 
 export default class FileRow extends Component {
   props: {
     file: object,
+    store: object,
     playFile: (file) => void,
     gameProfileLoad: (game) => void,
+    closeModal: () => void,
   };
+  
+  inputtext: string;
 
   playFile = () => {
     const file = this.props.file || {};
@@ -29,6 +37,39 @@ export default class FileRow extends Component {
 
     this.props.gameProfileLoad(fileGame);
   };
+
+  renameFile = () => {
+    const file = this.props.file || {};
+    const fileName = file.fileName || "";
+    const rootFolder = electronSettings.get('settings.rootSlpPath');
+
+    console.log(this.inputtext);
+    console.log(rootFolder);
+    console.log(fileName);
+  
+    fs.rename(rootFolder + '\\' + fileName, rootFolder + '\\' + this.inputtext + '.slp', function(err) {
+      if (err) console.log('ERROR: ' + err);
+      if (this.inputtext.includes('\\') || 
+          this.inputtext.includes('/') || 
+          this.inputtext.includes('?') || 
+          this.inputtext.includes('%') || 
+          this.inputtext.includes('*') || 
+          this.inputtext.includes(':') || 
+          this.inputtext.includes('|') || 
+          this.inputtext.includes('<') || 
+          this.inputtext.includes('>') || 
+          this.inputtext.includes('.')) {
+            this.generateFileRenameError();
+          } else {
+            console.log('Reloading...')
+            
+          }
+    });
+
+    this.props.file.fileName = this.inpputtext;
+    this.props.closeModal();
+    this.handleClose();
+  }
 
   generatePlayCell() {
     return (
@@ -47,6 +88,8 @@ export default class FileRow extends Component {
 
   generateFileNameCell() {
     const file = this.props.file || {};
+    const store = this.props.store || {};
+    const fileToEdit = store.fileToEdit;
 
     const fileName = file.fileName || "";
     const extension = path.extname(fileName);
@@ -54,7 +97,31 @@ export default class FileRow extends Component {
 
     return (
       <Table.Cell singleLine={true}>
-        {nameWithoutExt}
+        {nameWithoutExt + ' '}
+        <Modal trigger={
+          <Button
+            circular={true}
+            inverted={true}
+            size="tiny"
+            basic={true}
+            icon="pencil"
+          />
+          }
+          // TODO: Figure out how to make this switch between true and false
+          open={!!fileToEdit}
+        >
+          <Modal.Header>Rename Playback File</Modal.Header>
+          <Modal.Content>
+            <Modal.Description>
+            <div class="ui secondary segment">Note: You cannot use '/ \ ? % * : | " > .' in the file name, these are reserved characters.</div>
+            <br />
+              <Form onSubmit={this.renameFile}>
+                <Form.Input onChange={e => this.inputtext = e.target.value} name="fileName" label="File Name" />
+                <Form.Button content="Submit" />
+              </Form>
+            </Modal.Description>
+          </Modal.Content>
+        </Modal>
       </Table.Cell>
     );
   }
@@ -154,14 +221,15 @@ export default class FileRow extends Component {
 
   render() {
     return (
-      <Table.Row>
-        {this.generatePlayCell()}
-        {this.generateFileNameCell()}
-        {this.generateCharacterCell()}
-        {this.generateStageCell()}
-        {this.generateStartTimeCell()}
-        {this.generateOptionsCell()}
-      </Table.Row>
+        <Table.Row>
+          {this.generatePlayCell()}
+          {this.generateFileNameCell()}
+          {this.generateCharacterCell()}
+          {this.generateStageCell()}
+          {this.generateStartTimeCell()}
+          {this.generateOptionsCell()}
+        </Table.Row>
     );
   }
+
 }

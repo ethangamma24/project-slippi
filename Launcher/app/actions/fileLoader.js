@@ -9,6 +9,7 @@ const electronSettings = require('electron-settings');
 export const LOAD_ROOT_FOLDER = 'LOAD_ROOT_FOLDER';
 export const CHANGE_FOLDER_SELECTION = 'CHANGE_FOLDER_SELECTION';
 export const STORE_SCROLL_POSITION = 'STORE_SCROLL_POSITION';
+export const CLOSE_MODAL = 'CLOSE_MODAL';
 
 export function loadRootFolder() {
   return {
@@ -32,6 +33,14 @@ export function storeScrollPosition(position) {
     payload: {
       position: position,
     },
+  };
+}
+
+// TODO: Write function in reducers folder for this.
+export function closeModal() {
+  return {
+    type: CLOSE_MODAL,
+    payload: {},
   };
 }
 

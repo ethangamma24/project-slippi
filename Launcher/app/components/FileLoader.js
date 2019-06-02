@@ -16,6 +16,7 @@ export default class FileLoader extends Component {
     changeFolderSelection: (path) => void,
     playFile: (file) => void,
     storeScrollPosition: () => void,
+    closeModal: () => void,
 
     // game actions
     gameProfileLoad: (game) => void,
@@ -205,6 +206,7 @@ export default class FileLoader extends Component {
         file={file}
         playFile={this.props.playFile}
         gameProfileLoad={this.props.gameProfileLoad}
+        closeModal={this.props.closeModal}
       />
     ), this);
 

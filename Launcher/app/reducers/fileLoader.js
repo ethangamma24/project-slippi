@@ -1,6 +1,6 @@
 import SlippiGame from 'slp-parser-js';
 import {
-  LOAD_ROOT_FOLDER, CHANGE_FOLDER_SELECTION, STORE_SCROLL_POSITION
+  LOAD_ROOT_FOLDER, CHANGE_FOLDER_SELECTION, STORE_SCROLL_POSITION, RENAME_FILE
 } from '../actions/fileLoader';
 
 const fs = require('fs');
@@ -18,6 +18,8 @@ const defaultState = {
     x: 0,
     y: 0,
   },
+  oldName: "",
+  newName: "",
 };
 
 export default function fileLoader(state = defaultState, action) {
@@ -28,6 +30,8 @@ export default function fileLoader(state = defaultState, action) {
     return changeFolderSelection(state, action);
   case STORE_SCROLL_POSITION:
     return storeScrollPosition(state, action);
+    case RENAME_FILE:
+  return renameFile(state, action);
   default:
     return state;
   }
@@ -127,4 +131,11 @@ function storeScrollPosition(state, action) {
     ...state,
     scrollPosition: action.payload.position,
   };
+
+}
+
+function closeModal() {
+  const newState = { ...state };
+  newState.fileToEdit = null;
+  return newState;
 }

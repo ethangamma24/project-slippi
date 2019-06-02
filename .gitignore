@@ -218,3 +218,6 @@ pip-log.txt
 .mr.developer.cfg
 
 .idea/
+
+#Workspaces
+*.code-workspace
